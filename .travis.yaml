@@ -1,0 +1,8 @@
+language: dart
+
+dart:
+- "dev/release/2.0.0-dev.51.0"
+
+dart_task:
+- test: --platform vm
+

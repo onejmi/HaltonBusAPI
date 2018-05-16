@@ -1,4 +1,4 @@
-# HaltonBusAPI
+# HaltonBusAPI [![Build Status](https://travis-ci.org/scarger/HaltonBusAPI.svg?branch=master)](https://travis-ci.org/scarger/HaltonBusAPI)
 
 A Dart library created as an easy way to interface with [halton busses][bus-site].
 
