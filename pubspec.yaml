@@ -1,0 +1,16 @@
+name: HaltonBusAPI
+description: An API to retrieve information about traffic and delays of Halton District School Board buses
+version: 1.0.0
+# homepage: https://github.com/scarger/
+# author: Scarger <supremeterminal@gmail.com>
+
+environment:
+  sdk: '>=2.0.0-dev.51.0 <2.0.0'
+
+dependencies:
+  xml: ^3.0.0
+  http: ^0.11.1
+  intl: ^0.15.0
+
+dev_dependencies:
+  test: ^0.12.30
