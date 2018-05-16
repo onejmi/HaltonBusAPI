@@ -18,8 +18,8 @@ Halton busses to suit your needs.
 Adding to pub:
 ```yaml
 dependencies:
-      HaltonBusAPI:
-        git: git://github.com/scarger/HaltonBusAPI.git
+  HaltonBusAPI:
+    git: git://github.com/scarger/HaltonBusAPI.git
 ```
 
 
