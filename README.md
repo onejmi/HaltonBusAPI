@@ -16,15 +16,16 @@ HaltonBusAPI is quite simple to use, and is capable of interfacing with
 Halton busses to suit your needs.
 
 Adding to pub:
-
-    dependencies:
+```yaml
+dependencies:
       HaltonBusAPI:
         git: git://github.com/scarger/HaltonBusAPI.git
+```
 
 
 Initialization:
-
-    import 'package:HaltonBusAPI/HaltonBusAPI.dart';
+```dart
+import 'package:HaltonBusAPI/HaltonBusAPI.dart';
 
     main() {
       //define singleton instance of BusAPI
@@ -32,7 +33,7 @@ Initialization:
       //invoke api methods
       api...
     }
-
+```
 Examples can be found [here][examples].
 
 ## Documentation
@@ -44,6 +45,6 @@ and its methods.
 Please file feature requests and bugs at the [issue tracker][tracker].
 
 [tracker]: https://github.com/scarger/HaltonBusAPI/issues/
-[examples]: https://github.com/scarger/HaltonBusAPI/example/
+[examples]: https://github.com/scarger/HaltonBusAPI/tree/master/example/
 [bus-site]: https://haltonbus.ca/
-[docs]: https://scarger.github.io/hbapi/docs/
+[docs]: https://scarger.github.io/hbapi/
