@@ -5,7 +5,7 @@ version: 1.0.0
 # author: Scarger <supremeterminal@gmail.com>
 
 environment:
-  sdk: '>=2.0.0-dev.51.0 <2.0.0'
+  sdk: '>=2.0.0-dev.51.0'
 
 dependencies:
   xml: ^3.0.0
