@@ -19,7 +19,8 @@ Adding to pub:
 ```yaml
 dependencies:
   HaltonBusAPI:
-    git: git://github.com/scarger/HaltonBusAPI.git
+    git: 
+      url: https://github.com/scarger/HaltonBusAPI.git
 ```
 
 
