@@ -41,9 +41,11 @@ class BusAPI {
   /**
    * Returns a non-growable/immutable list of [Delay] objects for each transportation delay which is reported
    * This method uses [_cache] to retrieve its information, limiting the amount of requests
-   * to a maximum of once every 4 minutes.
+   * to a maximum of once every 4 minutes. Takes an optional parameter [invalidate] to force-replenish the cache of delays with
+   * updated data.
    */
-  Future<List<Delay>> latest() async {
+  Future<List<Delay>> latest({invalidate = false}) async {
+    _cache?.invalidated = invalidate;
     if(_cache == null || _cache.isExpired()) {
       _cache = new _Cache(await reqRaw());
     }
@@ -57,7 +59,7 @@ class BusAPI {
    * [latest] was never called)
    */
   reportLastUpdated() => new DateFormat("EEE, dd MMM yyyy hh:mm:ss zzz")
-      .parse(_cache?.response.findAllElements("lastBuildDate").first.text);
+      .parse(_cache?.response?.findAllElements("lastBuildDate")?.first?.text);
 
 }
 
@@ -74,6 +76,8 @@ class _Cache {
   ///Where the requested document ([reportResource]) is stored
   final XmlDocument response;
 
+  bool invalidated = false;
+
   /**
    * Constructs a new cache, setting the [_timestamp] to the current time
    */
@@ -84,5 +88,5 @@ class _Cache {
    * true => cache is expired, needs to be replaced
    * false => cache is relevant/safe to use
    */
-  isExpired() => (_timestamp+lifeDuration) < DateTime.now().millisecondsSinceEpoch;
+  isExpired() => invalidated || ((_timestamp+lifeDuration) < DateTime.now().millisecondsSinceEpoch);
 }
