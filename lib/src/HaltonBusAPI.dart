@@ -3,10 +3,14 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart';
 import 'package:intl/intl.dart';
+import 'package:html/parser.dart' as html;
+import 'package:html/dom.dart';
 import 'package:HaltonBusAPI/HaltonBusAPI.dart';
 
 ///URL to resource/website which bus delay information is retrieved from. Only English is supported (for now)
 const reportResource = "https://geoquery.haltonbus.ca/rss/Transportation-en-CA.xml";
+///URL to resource/website where the general notice about major delays and/or cancellations are posted.
+const generalNoticeResource = "https://geoquery.haltonbus.ca/Cancellations.aspx";
 ///Index in raw data ([String]) of [reportResource]'s XML where data starts to be relevant and properly formatted (in XML)
 const payloadStart = 3;
 
@@ -20,8 +24,9 @@ const payloadStart = 3;
 class BusAPI {
   ///global BusAPI instance, there can only be ONE
   static BusAPI _instance;
-  ///response cache, refreshed every ~4 minutes
-  _Cache _cache;
+  ///caches, refreshed every ~4 minutes
+  _Cache<XmlDocument> _delayCache;
+  _Cache<String> _statusCache;
   ///Singleton, which returns [_instance] on call, or lazy initializes it if null
   factory BusAPI() {
     return (_instance ??= new BusAPI._internal());
@@ -45,12 +50,22 @@ class BusAPI {
    * updated data.
    */
   Future<List<Delay>> latest({invalidate = false}) async {
-    _cache?.invalidated = invalidate;
-    if(_cache == null || _cache.isExpired()) {
-      _cache = new _Cache(await reqRaw());
+    _delayCache?.invalidated = invalidate;
+    if(_delayCache == null || _delayCache.isExpired()) {
+      _delayCache = new _Cache(await reqRaw());
     }
-    return _cache.response.findAllElements("item")
+    return _delayCache.response.findAllElements("item")
         .map((el) => new Delay(el.text)).toList(growable: false);
+  }
+
+  Future<String> currentStatus({invalidate = false}) async {
+    _statusCache?.invalidated = invalidate;
+    if(_statusCache == null || _statusCache.isExpired()) {
+      http.Response pageResponse = await http.get(generalNoticeResource);
+      Document page = await html.parse(pageResponse.body);
+      _statusCache = new _Cache(page.getElementById("ctl00_CPHPageBody_GeneralNoticesMsg").innerHtml);
+    }
+    return _statusCache.response;
   }
 
   /**
@@ -59,7 +74,7 @@ class BusAPI {
    * [latest] was never called)
    */
   reportLastUpdated() => new DateFormat("EEE, dd MMM yyyy hh:mm:ss zzz")
-      .parse(_cache?.response?.findAllElements("lastBuildDate")?.first?.text);
+      .parse(_delayCache?.response?.findAllElements("lastBuildDate")?.first?.text);
 
 }
 
@@ -68,13 +83,13 @@ class BusAPI {
  * milliseconds until needing to be replaced. This is put in to prevent redundant
  * uses of resources and time, as cache can be accessed instead of a costly new request
  */
-class _Cache {
+class _Cache<T> {
   ///Duration until cache expires
   static const lifeDuration = 240000;
   ///Time (since Epoch) of cache creation
   final _timestamp;
   ///Where the requested document ([reportResource]) is stored
-  final XmlDocument response;
+  final T response;
 
   bool invalidated = false;
 
