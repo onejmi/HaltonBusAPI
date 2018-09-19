@@ -11,6 +11,7 @@ import 'package:HaltonBusAPI/HaltonBusAPI.dart';
 const reportResource = "https://geoquery.haltonbus.ca/rss/Transportation-en-CA.xml";
 ///URL to resource/website where the general notice about major delays and/or cancellations are posted.
 const generalNoticeResource = "https://geoquery.haltonbus.ca/Cancellations.aspx";
+const generalNoticeResourceID = "ctl00_CPHPageBody_GeneralNoticesMsg";
 ///Index in raw data ([String]) of [reportResource]'s XML where data starts to be relevant and properly formatted (in XML)
 const payloadStart = 3;
 
@@ -63,7 +64,7 @@ class BusAPI {
     if(_statusCache == null || _statusCache.isExpired()) {
       http.Response pageResponse = await http.get(generalNoticeResource);
       Document page = await html.parse(pageResponse.body);
-      _statusCache = new _Cache(page.getElementById("ctl00_CPHPageBody_GeneralNoticesMsg").innerHtml);
+      _statusCache = new _Cache(page.getElementById(generalNoticeResourceID).innerHtml);
     }
     return _statusCache.response;
   }
