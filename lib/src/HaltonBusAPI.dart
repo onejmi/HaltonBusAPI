@@ -28,6 +28,8 @@ class BusAPI {
   ///caches, refreshed every ~4 minutes
   _Cache<XmlDocument> _delayCache;
   _Cache<String> _statusCache;
+  ///List of all schools apart of the HDSB or HCDSB transportation system
+  List<String> schoolNames;
   ///Singleton, which returns [_instance] on call, or lazy initializes it if null
   factory BusAPI() {
     return (_instance ??= new BusAPI._internal());
@@ -59,11 +61,25 @@ class BusAPI {
         .map((el) => new Delay(el.text)).toList(growable: false);
   }
 
+
+  /**
+   * Returns the current general transportation status for HDSB and HCDSB in the form of a [String]
+   * Takes an optional parameter [invalidate] to force-replenish the cached status with
+   * the updated one.
+   * This method also stores the list of HDSB and HCDSB schools in [schoolNames] the first time it is invoked
+   */
   Future<String> currentStatus({invalidate = false}) async {
     _statusCache?.invalidated = invalidate;
     if(_statusCache == null || _statusCache.isExpired()) {
       http.Response pageResponse = await http.get(generalNoticeResource);
       Document page = await html.parse(pageResponse.body);
+      if(_statusCache == null) {
+        final schoolDropdown = page.getElementById("ctl00_CPHPageBody_operatorSchoolFilter_schoolList");
+        schoolNames = schoolDropdown.children
+            .map((child) => child.innerHtml)
+            .where((school) => school != "--All--")
+            .toList(growable: false);
+      }
       _statusCache = new _Cache(page.getElementById(generalNoticeResourceID).innerHtml);
     }
     return _statusCache.response;

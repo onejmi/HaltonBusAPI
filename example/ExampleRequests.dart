@@ -27,8 +27,11 @@ main() async {
   //Current general status
   print(await api.currentStatus());
 
+  //print all schools involved in HDSB and HDCSB
+  print(api.schoolNames);
+
   //Access and print raw response data (never cached!)
   //This is commonly used for **DEBUGGING** purposes
-  print(await api.reqRaw());
+  print("Raw:\n${await api.reqRaw()}");
 
 }
